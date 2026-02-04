@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Groupe {{ group.name }}{% endblock %}
+
+{% block body %}
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div>
+                <h1 style="margin:0;">{{ group.name }}</h1>
+                <div class="muted">#{{ group.id }} — {{ group.contacts|length }} contact(s)</div>
+            </div>
+            <div class="row-actions">
+                <a class="btn" href="{{ path('group_index') }}">Retour</a>
+                <a class="btn" href="{{ path('contact_index', { q: group.name }) }}">Rechercher ce nom</a>
+            </div>
+        </div>
+
+        <div class="hr"></div>
+
+        {% if group.contacts is empty %}
+            <p class="muted">Aucun contact dans ce groupe.</p>
+        {% else %}
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Coordonnées</th>
+                    <th style="width:160px;"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for c in group.contacts %}
+                    <tr>
+                        <td><strong>{{ c.lastName }} {{ c.firstName }}</strong></td>
+                        <td>
+                            <div>📞 {{ c.phone }}</div>
+                            {% if c.email %}<div>✉️ {{ c.email }}</div>{% endif %}
+                        </td>
+                        <td>
+                            <div class="row-actions">
+                                <a class="btn small" href="{{ path('contact_show', {id: c.id}) }}">Voir</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}

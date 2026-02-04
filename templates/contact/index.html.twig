@@ -1,0 +1,113 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contacts{% endblock %}
+
+{% block body %}
+    <div class="card">
+        <form method="get" action="{{ path('contact_index') }}" class="searchbar">
+            <div class="searchbar__field">
+                <label for="q">Rechercher</label>
+                <input id="q" name="q" value="{{ q }}" placeholder="Nom, prénom, téléphone, email, champs personnalisés..." />
+                <div class="help">Astuce : la recherche parcourt aussi les champs étendus (ex: entreprise, ville...).</div>
+                <label class="fav-toggle">
+                    <input type="checkbox" name="fav" value="1" {% if fav %}checked{% endif %}>
+                    <span class="fav-toggle__pill" title="Afficher uniquement les favoris">
+                        <span class="fav-toggle__icon">⭐</span>
+                        <span>Favoris</span>
+                    </span>
+                </label>
+            </div>
+            <div class="searchbar__actions">
+                <button class="btn primary" type="submit">Chercher</button>
+                <a class="btn" href="{{ path('contact_index') }}">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="card">
+        <div class="results-header">
+            <h2 style="margin:0;">Résultats</h2>
+
+            <div class="results-header__right">
+                <div class="muted">{{ contacts|length }} contact(s)</div>
+                <a class="btn primary" href="{{ path('contact_new') }}">+ Nouveau</a>
+            </div>
+        </div>
+
+
+        <div class="hr"></div>
+
+        {% if contacts is empty %}
+            <p class="muted">Aucun contact trouvé.</p>
+            <a class="btn success" href="{{ path('contact_new') }}">Créer un contact</a>
+        {% else %}
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Coordonnées</th>
+                    <th>Groupes</th>
+                    <th style="width: 260px;"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for c in contacts %}
+                    <tr>
+                        <td>
+                            <div style="font-weight:700;">
+                                {% if c.favorite %}⭐{% else %}☆{% endif %}
+                                {{ c.lastName }} {{ c.firstName }}
+                            </div>
+                            <div class="muted">#{{ c.id }}</div>
+                        </td>
+
+                        <td>
+                            <div>📞 {{ c.phone }}</div>
+                            {% if c.email %}
+                                <div>✉️ {{ c.email }}</div>
+                            {% else %}
+                                <div class="muted">—</div>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if c.groups|length > 0 %}
+                                {% for g in c.groups %}
+                                    <span class="badge">{{ g.name }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <span class="muted">Aucun</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <div class="row-actions">
+                                {# Toggle favori #}
+                                <form method="post" action="{{ path('contact_toggle_favorite', {id: c.id}) }}" class="inline-form">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('toggle_favorite_' ~ c.id) }}">
+                                    <button class="btn small" type="submit" title="Favori">
+                                        {% if c.favorite %}⭐{% else %}☆{% endif %}
+                                    </button>
+                                </form>
+
+                                <a class="btn small" href="{{ path('contact_show', {id: c.id}) }}">Voir</a>
+                                <a class="btn small" href="{{ path('contact_edit', {id: c.id}) }}">Modifier</a>
+
+                                <form method="post"
+                                      action="{{ path('contact_delete', {id: c.id}) }}"
+                                      onsubmit="return confirm('Supprimer {{ c.lastName }} {{ c.firstName }} ?');"
+                                      class="inline-form">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_contact_' ~ c.id) }}">
+                                    <button class="btn small danger" type="submit">Supprimer</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}

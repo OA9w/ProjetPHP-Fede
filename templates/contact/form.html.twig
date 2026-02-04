@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>{{ title }}</h1>
+
+    {{ form_start(form) }}
+    {{ form_row(form.firstName) }}
+    {{ form_row(form.lastName) }}
+    {{ form_row(form.phone) }}
+    {{ form_row(form.email) }}
+    {% if form.photoFile is defined %}
+        <div class="form-row">
+            {{ form_label(form.photoFile) }}
+            {{ form_widget(form.photoFile) }}
+            {{ form_errors(form.photoFile) }}
+            <div class="help">JPG / PNG / WEBP (max 3 Mo)</div>
+        </div>
+    {% endif %}
+    {{ form_row(form.groupNames) }}
+
+    <h3>Champs personnalisés</h3>
+
+    <div
+        id="fields-collection"
+        data-prototype="{{ form_widget(form.fields.vars.prototype)|e('html_attr') }}"
+        data-index="{{ form.fields|length }}"
+    >
+        {% for fieldForm in form.fields %}
+            <div class="field-item">
+                {{ form_row(fieldForm.name) }}
+                {{ form_row(fieldForm.value) }}
+                <button type="button" class="btn-remove-field">Supprimer</button>
+                <hr>
+            </div>
+        {% endfor %}
+    </div>
+
+    <button type="button" id="btn-add-field">+ Ajouter un champ</button>
+
+
+    <button>Enregistrer</button>
+    {{ form_end(form) }}
+
+    <p><a href="{{ path('contact_index') }}">Retour</a></p>
+{% endblock %}

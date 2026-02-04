@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Contacts{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>📇</text></svg>">
+
+    {% block stylesheets %}
+        <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    {% endblock %}
+</head>
+
+<body>
+<header class="nav">
+    {% set route = app.request.attributes.get('_route') %}
+
+    <div class="nav-left">
+        <a class="brand" href="{{ path('contact_index') }}">📇 Carnet</a>
+
+        <nav class="tabs">
+            <a class="tab {{ route starts with 'contact_' ? 'active' : '' }}"
+               href="{{ path('contact_index') }}">
+                Carnet de contacts
+            </a>
+
+            <a class="tab {{ route starts with 'group_' ? 'active' : '' }}"
+               href="{{ path('group_index') }}">
+                Carnet de groupes
+            </a>
+        </nav>
+    </div>
+
+    <div class="nav-right">
+        {% if app.user %}
+            <span class="muted">Connecté : {{ app.user.userIdentifier }}</span>
+            <a class="btn" href="{{ path('app_logout') }}">Logout</a>
+        {% else %}
+            <a class="btn" href="{{ path('app_login') }}">Login</a>
+        {% endif %}
+    </div>
+</header>
+
+<main class="container">
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="flash">
+                <strong>{{ type|upper }}</strong> — {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    {% block body %}{% endblock %}
+</main>
+
+{% block javascripts %}
+    {% block importmap %}{{ importmap('app') }}{% endblock %}
+    <script src="{{ asset('js/fields-collection.js') }}"></script>
+{% endblock %}
+</body>
+</html>

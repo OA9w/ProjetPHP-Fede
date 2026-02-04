@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Groupes{% endblock %}
+
+{% block body %}
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+            <h1 style="margin:0;">Groupes</h1>
+            <a class="btn" href="{{ path('contact_index') }}">Contacts</a>
+        </div>
+
+        <div class="hr"></div>
+
+        {% if rows is empty %}
+            <p class="muted">Aucun groupe.</p>
+        {% else %}
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th style="width:160px;">Contacts</th>
+                    <th style="width:160px;"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in rows %}
+                    {% set g = row[0] is defined ? row[0] : row.g %}
+                    {% set cnt = row.cnt ?? row[1] ?? 0 %}
+                    <tr>
+                        <td><strong>{{ g.name }}</strong></td>
+                        <td>{{ cnt }}</td>
+                        <td>
+                            <div class="row-actions">
+                                <a class="btn small" href="{{ path('group_show', {id: g.id}) }}">Voir</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}

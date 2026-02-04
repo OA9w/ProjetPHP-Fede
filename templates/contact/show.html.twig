@@ -1,0 +1,99 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ contact.lastName }} {{ contact.firstName }}{% endblock %}
+
+{% block body %}
+
+    <div class="card">
+        <div class="page-head">
+            <div>
+                <h1 style="margin:0 0 6px 0;">{{ contact.lastName }} {{ contact.firstName }}</h1>
+                <div class="muted">Contact #{{ contact.id }}</div>
+            </div>
+
+            <div class="page-head__actions">
+                {# Favori en haut à droite #}
+                <form method="post" action="{{ path('contact_toggle_favorite', {id: contact.id}) }}" class="inline-form">
+                    <input type="hidden" name="_token" value="{{ csrf_token('toggle_favorite_' ~ contact.id) }}">
+                    <button class="btn" type="submit" title="Favori">
+                        {% if contact.favorite %}⭐ Retirer des favoris{% else %}☆ Mettre en favoris{% endif %}
+                    </button>
+                </form>
+
+                <a class="btn" href="{{ path('contact_edit', {id: contact.id}) }}">Modifier</a>
+
+                <form method="post"
+                      action="{{ path('contact_delete', {id: contact.id}) }}"
+                      class="inline-form"
+                      onsubmit="return confirm('Supprimer {{ contact.lastName }} {{ contact.firstName }} ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete_contact_' ~ contact.id) }}">
+                    <button class="btn danger" type="submit">Supprimer</button>
+                </form>
+
+                <a class="btn" href="{{ path('contact_index') }}">Retour</a>
+            </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="grid two">
+            <div>
+                <div style="margin-bottom:10px;">📞 <strong>{{ contact.phone }}</strong></div>
+                <div style="margin-bottom:10px;">
+                    ✉️
+                    {% if contact.email %}
+                        <a href="mailto:{{ contact.email }}">{{ contact.email }}</a>
+                    {% else %}
+                        <span class="muted">non renseigné</span>
+                    {% endif %}
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    📷
+                    {% if contact.photoPath %}
+                        <a href="{{ asset(contact.photoPath) }}" target="_blank">Voir la photo</a>
+                    {% else %}
+                        <span class="muted">—</span>
+                    {% endif %}
+                </div>
+
+                <div>
+                    👥 Groupes :
+                    {% if contact.groups|length > 0 %}
+                        {% for g in contact.groups %}
+                            <span class="badge">{{ g.name }}</span>
+                        {% endfor %}
+                    {% else %}
+                        <span class="muted">Aucun</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div>
+                <h2 style="margin:0 0 10px 0;">Champs personnalisés</h2>
+
+                {% if contact.fields|length > 0 %}
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Valeur</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for f in contact.fields %}
+                            <tr>
+                                <td style="font-weight:600;">{{ f.name }}</td>
+                                <td style="white-space:pre-wrap;">{{ f.value }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="muted">Aucun champ ajouté.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
