@@ -30,23 +30,25 @@ class ContactRepository extends ServiceEntityRepository
             ->addOrderBy('c.firstName', 'ASC')
             ->distinct();
 
-        // Filtre favoris
         if ($fav) {
             $qb->andWhere('c.isFavorite = true');
         }
 
-        $q = trim((string) $q);
+        $q = trim((string)$q);
+
         if ($q !== '') {
-            // Postgres : ILIKE = LIKE insensible à la casse
             $qb->andWhere(
-                'c.firstName ILIKE :q OR
-                 c.lastName ILIKE :q OR
-                 c.phone ILIKE :q OR
-                 c.email ILIKE :q OR
-                 f.name ILIKE :q OR
-                 f.value ILIKE :q OR
-                 g.name ILIKE :q'
-            )->setParameter('q', '%'.$q.'%');
+                $qb->expr()->orX(
+                    'LOWER(c.firstName) LIKE LOWER(:q)',
+                    'LOWER(c.lastName) LIKE LOWER(:q)',
+                    'LOWER(c.phone) LIKE LOWER(:q)',
+                    'LOWER(c.email) LIKE LOWER(:q)',
+                    'LOWER(f.name) LIKE LOWER(:q)',
+                    'LOWER(f.value) LIKE LOWER(:q)',
+                    'LOWER(g.name) LIKE LOWER(:q)'
+                )
+            )
+                ->setParameter('q', '%' . $q . '%');
         }
 
         return $qb->getQuery()->getResult();
