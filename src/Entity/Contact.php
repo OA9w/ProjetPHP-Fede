@@ -179,4 +179,23 @@ class Contact
     {
         $this->fields = $fields;
     }
+
+    public function addGroup(Group $group): self
+    {
+        if (!$this->groups->contains($group)) {
+            $this->groups->add($group);
+            $group->addContact($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGroup(Group $group): self
+    {
+        if ($this->groups->removeElement($group)) {
+            $group->removeContact($this);
+        }
+
+        return $this;
+    }
 }
